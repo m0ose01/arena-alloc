@@ -22,8 +22,11 @@ int arena_free(Arena *a);
 Arena arena_new(size_t capacity)
 {
 	void *data = calloc(1, capacity);
-	Arena arena = {capacity, 0, data};
-	return arena;
+	return (Arena) {
+		.capacity = capacity,
+		.size = 0,
+		.data = data
+	};
 }
 
 void *arena_alloc(Arena *a, size_t size)
