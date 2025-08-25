@@ -7,6 +7,7 @@ typedef struct Arena
 	size_t capacity;
 	size_t size;
 	void *data;
+	void *start;
 } Arena;
 
 typedef struct MyData
@@ -25,7 +26,7 @@ Arena arena_new(size_t capacity)
 	return (Arena) {
 		.capacity = capacity,
 		.size = 0,
-		.data = data
+		.data = data,
 	};
 }
 
@@ -70,9 +71,21 @@ int arena_free(Arena *a)
 	return 0;
 }
 
+int arena_reset(Arena *a)
+{
+	if (a == NULL)
+	{
+		return 1;
+	}
+	a->size = 0;
+	return 0;
+}
+
 int main(void)
 {
 	Arena my_memory = arena_new(sizeof(MyData) * 2);
+
+
 	MyData *my_data = arena_alloc(&my_memory, sizeof(MyData), _Alignof(MyData));
 	MyData *my_data_2 = arena_alloc(&my_memory, sizeof(MyData), _Alignof(MyData));
 	if (my_data_2 == NULL)
@@ -94,6 +107,16 @@ int main(void)
 
 	printf("%i\n", my_data->nums[7]);
 	printf("%s\n", my_data_2->name);
+
+	arena_reset(&my_memory);
+
+	char *my_new_data = arena_alloc(&my_memory, sizeof(char) * 8, _Alignof(char));
+	for (int ii = 0; ii < 8; ii++)
+	{
+		my_new_data[ii] = 'A' + ii;
+	}
+	my_new_data[8] = '\0';
+	printf("%s\n", my_new_data);
 
 	arena_free(&my_memory);
 }
