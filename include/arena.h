@@ -1,3 +1,6 @@
+#ifndef ARENA_H
+#define ARENA_H
+
 #include <stdlib.h>
 
 typedef struct Arena
@@ -12,3 +15,5 @@ Arena arena_new(size_t capacity);
 void *arena_alloc(Arena *a, size_t size, size_t alignment);
 int arena_reset(Arena *a);
 int arena_free(Arena *a);
+
+#endif
