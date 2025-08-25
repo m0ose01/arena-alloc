@@ -16,7 +16,7 @@ typedef struct MyData
 } MyData;
 
 Arena arena_new(size_t capacity);
-void *arena_alloc(Arena *a, size_t size);
+void *arena_alloc(Arena *a, size_t size, size_t alignment);
 int arena_free(Arena *a);
 
 Arena arena_new(size_t capacity)
@@ -29,10 +29,20 @@ Arena arena_new(size_t capacity)
 	};
 }
 
-void *arena_alloc(Arena *a, size_t size)
+void *arena_alloc(Arena *a, size_t size, size_t alignment)
 {
 	void *data;
-	if (a->size + size > a->capacity)
+
+	if (alignment == 0)
+	{
+		return NULL;
+	}
+
+	// Find the padding required for alignment
+	// TODO: check if this calculation is the best way to do it.
+	size_t padding = (alignment - ((size_t)((uint8_t *)a->data + a->size) % alignment)) % alignment;
+	size_t new_size = a->size + padding + size;
+	if (new_size > a->capacity)
 	{
 		return NULL;
 	}
@@ -41,8 +51,8 @@ void *arena_alloc(Arena *a, size_t size)
 		return NULL;
 	}
 
+	a->size = new_size;
 	data = (uint8_t*)a->data + (size - 1);
-	a->size += size;
 	return data;
 }
 
@@ -63,10 +73,12 @@ int arena_free(Arena *a)
 int main(void)
 {
 	Arena my_memory = arena_new(sizeof(MyData) * 2);
-	MyData *my_data = arena_alloc(&my_memory, sizeof(MyData));
-	MyData *my_data_2 = arena_alloc(&my_memory, sizeof(MyData));
+	MyData *my_data = arena_alloc(&my_memory, sizeof(MyData), _Alignof(MyData));
+	MyData *my_data_2 = arena_alloc(&my_memory, sizeof(MyData), _Alignof(MyData));
 	if (my_data_2 == NULL)
 	{
+		printf("Could not allocate from arena: Current Size: %li, Capacity: %li\n", my_memory.size, my_memory.capacity);
+		return 1;
 	}
 	char *hi = "hiii";
 	for (int ii = 0; ii < 5; ii++)
