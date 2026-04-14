@@ -35,8 +35,8 @@ void *arena_alloc(Arena *a, size_t size, size_t alignment)
 		return NULL;
 	}
 
+	data = (uint8_t*)a->data + (a->size) + padding;
 	a->size = new_size;
-	data = (uint8_t*)a->data + (size - 1);
 	return data;
 }
 
