@@ -3,17 +3,30 @@
 
 #include <arena.h>
 
+typedef struct Region_t
+{
+	void *ptr;
+	size_t size;
+	size_t capacity;
+} Region;
+
+struct Arena_t
+{
+	// TODO: Turn this into a dynamic array.
+	Region regions[MAX_REGIONS];
+	uint8_t current_region_index;
+};
+
 Region region_new(size_t capacity);
 void *region_alloc(Region *r, size_t size, size_t alignment);
 void region_reset(Region *r);
 size_t calculate_padding(const void *ptr, size_t size, size_t alignment);
 
-Arena arena_new(size_t capacity)
+Arena *arena_new(size_t capacity)
 {
-	return (Arena) {
-		.current_region_index = 0,
-		.regions = { region_new(capacity) }
-	};
+	Arena *arena = calloc(1, sizeof(Arena));
+	arena->regions[0] = region_new(capacity);
+	return arena;
 }
 
 void *arena_alloc(Arena *a, size_t size, size_t alignment)
@@ -73,6 +86,7 @@ void arena_free(Arena *a)
 		current_region->capacity = 0;
 	}
 	a->current_region_index = 0;
+	free(a);
 }
 
 void *region_alloc(Region *r, size_t size, size_t alignment)
