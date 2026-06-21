@@ -18,10 +18,10 @@ struct Arena_t
 	uint8_t allocated_regions;
 };
 
-Region region_new(size_t capacity);
-void *region_alloc(Region *r, size_t size, size_t alignment);
-void region_reset(Region *r);
-size_t calculate_padding(const void *ptr, size_t alignment);
+static Region region_new(size_t capacity);
+static void *region_alloc(Region *r, size_t size, size_t alignment);
+static void region_reset(Region *r);
+static size_t calculate_padding(const void *ptr, size_t alignment);
 
 Arena *arena_new(size_t capacity)
 {
@@ -99,7 +99,7 @@ void arena_free(Arena *a)
 	free(a);
 }
 
-void *region_alloc(Region *r, size_t size, size_t alignment)
+static void *region_alloc(Region *r, size_t size, size_t alignment)
 {
 	size_t padding = calculate_padding((uint8_t *)r->ptr + r->size, alignment);
 	size_t new_size = r->size + padding + size;
@@ -113,7 +113,7 @@ void *region_alloc(Region *r, size_t size, size_t alignment)
 	return data;
 }
 
-Region region_new(size_t capacity)
+static Region region_new(size_t capacity)
 {
 	void *data = calloc(1, capacity);
 
@@ -129,12 +129,12 @@ Region region_new(size_t capacity)
 	};
 }
 
-void region_reset(Region *r)
+static void region_reset(Region *r)
 {
 	r->size = 0;
 }
 
-size_t calculate_padding(const void *ptr, size_t alignment)
+static size_t calculate_padding(const void *ptr, size_t alignment)
 {
 	return (alignment - ((size_t)((uint8_t *)ptr) % alignment)) % alignment;
 }
