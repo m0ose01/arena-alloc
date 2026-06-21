@@ -56,6 +56,7 @@ int main(void)
 	char *str;
 	for (int ii = 0; ii < 100; ii++)
 	{
+		arena_reset(large_arena);
 		const int count = sizeof(char) * (26);
 		str = arena_alloc(large_arena, count, sizeof(char));
 		if (str == NULL)
