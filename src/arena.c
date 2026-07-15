@@ -62,7 +62,7 @@ void *arena_alloc(Arena *a, size_t size, size_t alignment)
 		size_t allocation_size = size + padding;
 		size_t new_capacity = current_region->capacity > allocation_size ? current_region->capacity : allocation_size;
 
-		if (++a->current_region_index > a->allocated_regions)
+		if (++a->current_region_index > a->allocated_regions++)
 		{
 			a->regions[a->current_region_index] = region_new(new_capacity);
 		}
