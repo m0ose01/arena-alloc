@@ -23,8 +23,11 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 add_library(arena STATIC src/arena.c)
 target_include_directories(arena PUBLIC "include")
 
+add_library(string STATIC src/string.c)
+target_include_directories(string PUBLIC "include")
+
 add_executable(arena_test EXCLUDE_FROM_ALL src/main.c)
-target_link_libraries(arena_test PRIVATE arena)
+target_link_libraries(arena_test PRIVATE arena string)
 
 get_property(target_names DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
 
