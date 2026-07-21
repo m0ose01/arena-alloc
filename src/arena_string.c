@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include <arena.h>
-#include <string.h>
+#include <arena_string.h>
 
 AllocFunction string_default_alloc = malloc;
 
