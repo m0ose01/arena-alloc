@@ -42,5 +42,6 @@ bool string_slice_equal(StringSlice slice_a, StringSlice slice_b);
 #define STRING_LENGTH(s) s.length
 #define SLICE_FROM_STATIC_STRING(s) (StringSlice){ .data = s, .length = sizeof(s) - 1 }
 #define STRING_FROM_STATIC_STRING(s) string_new_from_slice( (StringSlice){ .data = s, .length = sizeof(s) - 1 } )
+#define STRING_GET_RAW_POINTER(s) s.data
 
 #endif
