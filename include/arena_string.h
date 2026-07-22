@@ -27,6 +27,7 @@ String string_new(size_t capacity);
 String string_new_from_slice(StringSlice slice);
 char *string_to_cstring(String str);
 StringSlice string_slice(String str, size_t begin, size_t length);
+StringSlice string_as_slice(String str);
 String string_new_arena(size_t capacity, size_t alignment, Arena *arena);
 int string_push(String *str, char item);
 int string_pop(String *str, char *item);

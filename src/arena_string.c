@@ -55,6 +55,14 @@ StringSlice string_slice(String str, size_t begin, size_t length)
 	};
 }
 
+StringSlice string_as_slice(String str)
+{
+	return (StringSlice) {
+		.data = str.data,
+		.length = str.length,
+	};
+}
+
 String string_new_arena(size_t capacity, size_t alignment, Arena *arena)
 {
 	char *data = arena_alloc(arena, sizeof( char ) * (capacity + 1), alignment);
