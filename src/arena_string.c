@@ -178,3 +178,16 @@ String string_copy(String str)
 {
 	return string_new_from_slice(string_slice(str, 0, str.length));
 }
+
+uint64_t string_hash(StringSlice slice)
+{
+	const uint64_t prime_numbers[] = { 55476315010378721, 63646009107264737, 67354137784070743, 39967243858431091, 57601086460062329, 39793605331455817, 58692382681956689, 52497690708979949 };
+	const uint_fast8_t n_prime_numbers = sizeof(prime_numbers) / sizeof(uint64_t);
+
+	uint64_t hash = 1;
+	for (size_t current_char = 0; current_char < slice.length; current_char++)
+	{
+		hash *= prime_numbers[slice.data[current_char] % n_prime_numbers] + prime_numbers[(slice.data[current_char] + 1) % n_prime_numbers] ^ prime_numbers[(slice.data[current_char]+ 2) % n_prime_numbers];
+	}
+	return hash;
+}

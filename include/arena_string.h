@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include <arena.h>
 
@@ -38,6 +39,7 @@ size_t string_split(String str, StringSlice pattern, StringSlice *slice_a, Strin
 String string_copy(String str);
 int string_trim(String *str, size_t n);
 bool string_slice_equal(StringSlice slice_a, StringSlice slice_b);
+uint64_t string_hash(StringSlice slice);
 
 #define STRING_FORMAT(s) (int)s.length, s.data
 #define STRING_LENGTH(s) s.length

@@ -116,4 +116,12 @@ int main(void)
 
 	arena_free(context_arena);
 	context_arena = NULL;
+
+	printf("hash\n");
+	for (size_t current_slice_idx = 0; current_slice_idx < 128; current_slice_idx++)
+	{
+		size_t slice_length = 27;
+		StringSlice current_slice = string_slice(text, (8 + current_slice_idx) % (STRING_LENGTH(text) - slice_length), slice_length);
+		printf("%ju\n", (uintmax_t)string_hash(current_slice));
+	}
 }
