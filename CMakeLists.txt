@@ -20,14 +20,11 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-add_library(arena STATIC src/arena.c)
+add_library(arena STATIC src/arena.c src/arena_string.c)
 target_include_directories(arena PUBLIC "include")
 
-add_library(arena_string STATIC src/arena_string.c)
-target_include_directories(arena_string PUBLIC "include")
-
 add_executable(arena_test EXCLUDE_FROM_ALL src/main.c)
-target_link_libraries(arena_test PRIVATE arena string)
+target_link_libraries(arena_test PRIVATE arena)
 
 get_property(target_names DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
 

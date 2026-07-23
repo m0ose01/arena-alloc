@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include <arena.h>
-#include <string.h>
+#include <arena_string.h>
 
 typedef struct MyData
 {
