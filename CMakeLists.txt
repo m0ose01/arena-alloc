@@ -8,6 +8,8 @@ project(
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 99)
 
+add_subdirectory(extern EXCLUDE_FROM_ALL)
+
 if(${ASAN})
 	if(${CMAKE_C_COMPILER_ID} MATCHES "Clang" OR ${CMAKE_C_COMPILER_ID} MATCHES "GNU")
 		add_compile_options("-g" "-fsanitize=address" "-fno-omit-frame-pointer")
