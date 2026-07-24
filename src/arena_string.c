@@ -5,24 +5,22 @@
 #include <arena.h>
 #include <arena_string.h>
 
-AllocFunction string_default_alloc = malloc;
-
-String string_new(size_t capacity)
+String string_new(size_t capacity, Arena *a)
 {
-	String string = {
+	char *data = arena_alloc(a, sizeof( char ) * (capacity + 1), 1);
+	data[capacity] = '\0';
+	return ( String ) {
 		.capacity = capacity,
 		.length = 0,
-		.data = string_default_alloc(sizeof( char ) * (capacity + 1))
+		.data = data,
 	};
-	string.data[capacity] = '\0';
-	return string;
 }
 
-String string_new_from_slice(StringSlice slice)
+String string_new_from_slice(StringSlice slice, Arena *a)
 {
 	size_t capacity = sizeof(char) * slice.length;
 	String string = {
-		.data = string_default_alloc(capacity + 1),
+		.data = arena_alloc(a, capacity + 1, 1),
 		.capacity = capacity / sizeof(char),
 		.length = slice.length,
 	};
@@ -36,9 +34,9 @@ String string_new_from_slice(StringSlice slice)
 	return string;
 }
 
-char *string_to_cstring(String str)
+char *string_to_cstring(String str, Arena *a)
 {
-	char *cstring = string_default_alloc(sizeof(char) * (str.length + 1));
+	char *cstring = arena_alloc(a, sizeof(char) * (str.length + 1), 1);
 	for (size_t current_char = 0; current_char < str.length; current_char++)
 	{
 		cstring[current_char] = str.data[current_char];
@@ -60,17 +58,6 @@ StringSlice string_as_slice(String str)
 	return (StringSlice) {
 		.data = str.data,
 		.length = str.length,
-	};
-}
-
-String string_new_arena(size_t capacity, size_t alignment, Arena *arena)
-{
-	char *data = arena_alloc(arena, sizeof( char ) * (capacity + 1), alignment);
-	data[capacity] = '\0';
-	return ( String ) {
-		.capacity = capacity,
-		.length = 0,
-		.data = data,
 	};
 }
 
@@ -112,11 +99,6 @@ int string_set(String *str, size_t idx, char item)
 	}
 	str->data[idx] = item;
 	return 0;
-}
-
-void string_set_alloc_function(AllocFunction f)
-{
-	string_default_alloc = f;
 }
 
 int string_trim(String *str, size_t n)
@@ -174,12 +156,12 @@ size_t string_split(String str, StringSlice pattern, StringSlice *slice_a, Strin
 	return index;
 }
 
-String string_copy(String str)
+String string_copy(String str, Arena *a)
 {
-	return string_new_from_slice(string_slice(str, 0, str.length));
+	return string_new_from_slice(string_slice(str, 0, str.length), a);
 }
 
-uint64_t string_hash(StringSlice slice)
+uint64_t string_slice_hash(StringSlice slice)
 {
 	const uint64_t prime_numbers[] = { 55476315010378721, 63646009107264737, 67354137784070743, 39967243858431091, 57601086460062329, 39793605331455817, 58692382681956689, 52497690708979949 };
 	const uint_fast8_t n_prime_numbers = sizeof(prime_numbers) / sizeof(uint64_t);
