@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch lldb",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/arena_test",
+      "args": [],
+      "cwd": "${workspaceFolder}/build",
+      "stopOnEntry": false,
+      "stdio": [null, "/tmp/dap.log", "/tmp/dap.log"],
+      "initCommands": [
+        "settings set target.inline-breakpoint-strategy always",
+		"settings set target.process.run-all-threads false"
+      ]
+    }
+  ]
+}
+
