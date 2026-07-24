@@ -4,6 +4,7 @@
 
 #include <arena.h>
 #include <arena_string.h>
+#include <arena_hashtable.h>
 
 typedef struct MyData
 {
@@ -112,6 +113,29 @@ int main(void)
 		StringSlice current_slice = string_slice(text, (8 + current_slice_idx) % (STRING_LENGTH(text) - slice_length), slice_length);
 		printf("%ju\n", (uintmax_t)string_slice_hash(current_slice));
 	}
+
+	HashTable *table = hashtable_new(32, string_arena);
+
+	if (hashtable_update(table, SLICE_FROM_STATIC_STRING("cats"), 3) != 0)
+	{
+		fprintf(stderr, "Error: failed to allocate.\n");
+		return -1;
+	}
+	if (hashtable_update(table, SLICE_FROM_STATIC_STRING("dogs"), 16) != 0)
+	{
+		fprintf(stderr, "Error: Failed to allocate.\n");
+		return -1;
+	}
+	if (hashtable_update(table, SLICE_FROM_STATIC_STRING("horses"), 48) != 0)
+	{
+		fprintf(stderr, "Error: Failed to allocate.\n");
+		return -1;
+	}
+
+	uint32_t cats = hashtable_get(table, SLICE_FROM_STATIC_STRING("cats"));
+	uint32_t dogs = hashtable_get(table, SLICE_FROM_STATIC_STRING("dogs"));
+	uint32_t horses = hashtable_get(table, SLICE_FROM_STATIC_STRING("horses"));
+	printf("I have %i cats, %i dogs, and %i horses\n", cats, dogs, horses);
 
 	arena_free(string_arena);
 	string_arena = NULL;

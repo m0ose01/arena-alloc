@@ -20,7 +20,7 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-add_library(arena STATIC src/arena.c src/arena_string.c)
+add_library(arena STATIC src/arena.c src/arena_string.c src/arena_hashtable.c)
 target_include_directories(arena PUBLIC "include")
 
 add_executable(arena_test EXCLUDE_FROM_ALL src/main.c)
