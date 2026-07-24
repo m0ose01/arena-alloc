@@ -34,14 +34,14 @@ String string_new_from_slice(StringSlice slice, Arena *a)
 	return string;
 }
 
-char *string_to_cstring(String str, Arena *a)
+char *string_slice_to_cstring(StringSlice slice, Arena *a)
 {
-	char *cstring = arena_alloc(a, sizeof(char) * (str.length + 1), 1);
-	for (size_t current_char = 0; current_char < str.length; current_char++)
+	char *cstring = arena_alloc(a, sizeof(char) * (slice.length + 1), 1);
+	for (size_t current_char = 0; current_char < slice.length; current_char++)
 	{
-		cstring[current_char] = str.data[current_char];
+		cstring[current_char] = slice.data[current_char];
 	}
-	cstring[str.length] = '\0';
+	cstring[slice.length] = '\0';
 	return cstring;
 }
 
