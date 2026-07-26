@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(
 	Arena VERSION 0.0.1
 	DESCRIPTION "An arena allocator."
-	LANGUAGES C
+	LANGUAGES C CXX
 	)
 
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -24,6 +24,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 add_library(arena STATIC src/arena.c src/arena_string.c src/arena_hashtable.c)
 target_include_directories(arena PUBLIC "include")
+target_link_libraries(arena PRIVATE Tracy::TracyClient)
 
 add_executable(arena_test EXCLUDE_FROM_ALL src/main.c)
 target_link_libraries(arena_test PRIVATE arena)

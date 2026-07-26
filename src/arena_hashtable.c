@@ -2,6 +2,7 @@
 #include <arena_string.h>
 
 #include <string.h>
+#include <tracy/TracyC.h>
 
 typedef struct HashTableEntry_t
 {
@@ -26,6 +27,7 @@ static size_t get_index(uint64_t hash, size_t size)
 
 HashTable *hashtable_new(size_t size, Arena *a)
 {
+	TracyCZone(ctx, true);
 	HashTable *t = arena_alloc(a, sizeof(HashTable), HASHTABLE_DEFAULT_ALIGNMENT);
 	t->arena = a;
 	t->size = size;
@@ -34,11 +36,13 @@ HashTable *hashtable_new(size_t size, Arena *a)
 	// The 'entry' field must be zero-initialised, so that random data is not mistaken for a valid entry.
 	memset(t->entries, 0, size * sizeof(HashTableEntry));
 
+	TracyCZoneEnd(ctx);
 	return t;
 }
 
 int hashtable_update(HashTable *t, StringSlice key, uint32_t val)
 {
+	TracyCZone(ctx, true);
 	uint64_t hash = string_slice_hash(key);
 
 	// this should never be zero, so we can use zero as value for 'no entry' in hashtable_get()
@@ -64,11 +68,13 @@ int hashtable_update(HashTable *t, StringSlice key, uint32_t val)
 	entry->next = NULL;
 
 	t->entries[idx] = entry;
+	TracyCZoneEnd(ctx);
 	return 0;
 }
 
 uint32_t hashtable_get(HashTable *t, StringSlice key)
 {
+	TracyCZone(ctx, true);
 	uint64_t hash = string_slice_hash(key);
 	size_t idx = get_index(hash, t->size);
 	HashTableEntry *entry = t->entries[idx];
@@ -79,5 +85,6 @@ uint32_t hashtable_get(HashTable *t, StringSlice key)
 			return entry->val;
 		}
 	}
+	TracyCZoneEnd(ctx);
 	return 0;
 }
