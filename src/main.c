@@ -5,6 +5,9 @@
 #include <arena.h>
 #include <arena_string.h>
 #include <arena_hashtable.h>
+#include <arena_array.h>
+
+DEFINE_ARRAY(I32Array, int32_t)
 
 typedef struct MyData
 {
@@ -136,6 +139,36 @@ int main(void)
 	uint32_t dogs = hashtable_get(table, SLICE_FROM_STATIC_STRING("dogs"));
 	uint32_t horses = hashtable_get(table, SLICE_FROM_STATIC_STRING("horses"));
 	printf("I have %i cats, %i dogs, and %i horses\n", cats, dogs, horses);
+
+	Arena *arr_arena = arena_new(sizeof(int32_t) * 64);
+
+	I32Array array = I32Array_new(32, 4, arr_arena);
+
+	printf("Length: %zu\n", arraylen(array));
+	for (size_t ii = 0; ii < 32; ii++)
+	{
+		if (I32Array_push(&array, ii) != 0)
+		{
+			fprintf(stderr, "Error: Could not push item\n");
+			return -1;
+		}
+	}
+
+	const size_t maxlen = arraylen(array);
+	printf("Length: %zu\n", maxlen);
+
+	for (size_t ii = 0; ii < maxlen; ii++)
+	{
+		int32_t item;
+		if (I32Array_pop(&array, &item) != 0)
+		{
+			fprintf(stderr, "Error: Could not get item.\n");
+			return -1;
+		}
+		printf("%i\n", item);
+	}
+
+	printf("Length: %zu\n", arraylen(array));
 
 	arena_free(string_arena);
 	string_arena = NULL;
