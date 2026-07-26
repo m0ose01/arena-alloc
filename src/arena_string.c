@@ -74,6 +74,7 @@ int string_get(String str, size_t idx, char *item)
 	TracyCZone(ctx, true);
 	if (idx >= str.length || idx < 0)
 	{
+		TracyCZoneEnd(ctx);
 		return -1;
 	}
 	*item = str.data[idx];
@@ -86,6 +87,7 @@ int string_push(String *str, char item)
 	TracyCZone(ctx, true);
 	if (str->length >= (str->capacity - 1))
 	{
+		TracyCZoneEnd(ctx);
 		return -1;
 	}
 	str->data[str->length++] = item;
@@ -98,6 +100,7 @@ int string_pop(String *str, char *item)
 	TracyCZone(ctx, true);
 	if (str->length <= 0)
 	{
+		TracyCZoneEnd(ctx);
 		return -1;
 	}
 	*item = str->data[--str->length];
@@ -110,6 +113,7 @@ int string_set(String *str, size_t idx, char item)
 	TracyCZone(ctx, true);
 	if (idx >= str->length || idx < 0)
 	{
+		TracyCZoneEnd(ctx);
 		return -1;
 	}
 	str->data[idx] = item;
@@ -122,6 +126,7 @@ int string_trim(String *str, size_t n)
 	TracyCZone(ctx, true);
 	if (str->length < n)
 	{
+		TracyCZoneEnd(ctx);
 		return -1;
 	}
 	str->length -= n;
@@ -134,6 +139,7 @@ bool string_slice_equal(StringSlice slice_a, StringSlice slice_b)
 	TracyCZone(ctx, true);
 	if (slice_a.length != slice_b.length)
 	{
+		TracyCZoneEnd(ctx);
 		return false;
 	}
 
@@ -141,6 +147,7 @@ bool string_slice_equal(StringSlice slice_a, StringSlice slice_b)
 	{
 		if (slice_a.data[current_char] != slice_b.data[current_char])
 		{
+			TracyCZoneEnd(ctx);
 			return false;
 		}
 	}
@@ -156,6 +163,7 @@ size_t string_find(String str, StringSlice pattern)
 		StringSlice substring = string_slice(str, current_char_idx, pattern.length);
 		if (string_slice_equal(substring, pattern))
 		{
+			TracyCZoneEnd(ctx);
 			return current_char_idx;
 		}
 	}
@@ -171,6 +179,7 @@ size_t string_split(String str, StringSlice pattern, StringSlice *slice_a, Strin
 	{
 		*slice_a = string_slice(str, 0, 0);
 		*slice_b = string_slice(str, 0, 0);
+		TracyCZoneEnd(ctx);
 		return index;
 	}
 	*slice_a = string_slice(str, 0, index);
