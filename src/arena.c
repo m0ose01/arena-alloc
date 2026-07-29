@@ -159,7 +159,7 @@ static size_t calculate_padding(const void *ptr, size_t alignment)
 
 static void *arena_malloc_(size_t size)
 {
-	void *ptr = malloc(size);
+	void *ptr = calloc(1, size);
 	TracyCAlloc(ptr, size);
 	return ptr;
 }
