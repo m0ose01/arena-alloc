@@ -72,7 +72,7 @@ StringSlice string_as_slice(String str)
 int string_get(String str, size_t idx, char *item)
 {
 	TracyCZone(ctx, true);
-	if (idx >= str.length || idx < 0)
+	if (idx >= str.length)
 	{
 		TracyCZoneEnd(ctx);
 		return -1;
@@ -111,7 +111,7 @@ int string_pop(String *str, char *item)
 int string_set(String *str, size_t idx, char item)
 {
 	TracyCZone(ctx, true);
-	if (idx >= str->length || idx < 0)
+	if (idx >= str->length)
 	{
 		TracyCZoneEnd(ctx);
 		return -1;
@@ -203,7 +203,7 @@ uint64_t string_slice_hash(StringSlice slice)
 	uint64_t hash = 1;
 	for (size_t current_char = 0; current_char < slice.length; current_char++)
 	{
-		hash *= prime_numbers[slice.data[current_char] % n_prime_numbers] + prime_numbers[(slice.data[current_char] + 1) % n_prime_numbers] ^ prime_numbers[(slice.data[current_char]+ 2) % n_prime_numbers];
+		hash *= (prime_numbers[slice.data[current_char] % n_prime_numbers] + prime_numbers[(slice.data[current_char] + 1) % n_prime_numbers]) ^ (prime_numbers[(slice.data[current_char]+ 2) % n_prime_numbers]);
 	}
 	TracyCZoneEnd(ctx);
 	return hash;
