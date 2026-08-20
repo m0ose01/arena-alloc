@@ -40,6 +40,30 @@ String string_new_from_slice(StringSlice slice, Arena *a)
 	return string;
 }
 
+String string_from_cstring(char *cstring, Arena *a)
+{
+	if (cstring == NULL)
+	{
+		return (String) { .data = NULL, .length = 0, .capacity = 0 };
+	}
+
+	const size_t max_c_string_length = 0;
+	size_t length = 0;
+
+	for (size_t current_char = 0; (current_char < max_c_string_length) || (max_c_string_length == 0); current_char++)
+	{
+		if (cstring[current_char] == '\0')
+		{
+			break;
+		}
+		length++;
+	}
+
+	StringSlice cstring_slice = SLICE_FROM_PTR_AND_LENGTH(cstring, length);
+
+	return string_new_from_slice(cstring_slice, a);
+}
+
 char *string_slice_to_cstring(StringSlice slice, Arena *a)
 {
 	TracyCZone(ctx, true);

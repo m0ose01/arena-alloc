@@ -24,6 +24,7 @@ typedef struct string_slice_t
 String string_new(size_t capacity, Arena *a);
 String string_new_from_slice(StringSlice slice, Arena *a);
 String string_copy(String str, Arena *a);
+String string_from_cstring(char *cstring, Arena *a);
 char *string_slice_to_cstring(StringSlice slice, Arena *a);
 
 StringSlice string_slice(String str, size_t begin, size_t length);
@@ -40,7 +41,7 @@ uint64_t string_slice_hash(StringSlice slice);
 #define STRING_FORMAT(s) (int)s.length, s.data
 #define STRING_LENGTH(s) s.length
 #define SLICE_FROM_STATIC_STRING(s) (StringSlice){ .data = s, .length = sizeof(s) - 1 }
-#define SLICE_FROM_STATIC_STRING_AND_LENGTH(s, l) (StringSlice){ .data = s, .length = l }
+#define SLICE_FROM_PTR_AND_LENGTH(s, l) (StringSlice){ .data = s, .length = l }
 #define STRING_GET_RAW_POINTER(s) s.data
 
 #ifdef __GNUC__
