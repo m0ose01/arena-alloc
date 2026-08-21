@@ -93,7 +93,7 @@ String string_format_v(StringSlice format_string, Arena *a, va_list args)
 
 	size_t formatted_string_length = get_formatted_string_length(format_string, args_b);
 
-	String new_string = string_new(formatted_string_length + 1, a);
+	String new_string = string_new(formatted_string_length, a);
 
 	String empty_string = {
 		.data = NULL,
@@ -113,34 +113,44 @@ String string_format_v(StringSlice format_string, Arena *a, va_list args)
 		{
 			if (string_push(&new_string, current_char) != 0)
 			{
+				va_end(args_b);
+				TracyCZoneEnd(ctx);
 				return empty_string;
 			}
 			continue;
 		}
 		current_char_idx++;
+		if (current_char_idx >= STRING_LENGTH(format_string))
+		{
+			break;
+		}
 		current_char = format_string.data[current_char_idx];
 
 		switch (current_char)
 		{
 			case 's':
 				{
-					StringSlice slice = va_arg(args_b, StringSlice);
+					StringSlice slice = va_arg(args, StringSlice);
 					if (string_push_slice(&new_string, slice) != 0)
 					{
+						va_end(args_b);
+						TracyCZoneEnd(ctx);
 						return empty_string;
 					}
 					break;
 				}
 			default:
 				// invalid format string, return empty string
+				va_end(args_b);
+				TracyCZoneEnd(ctx);
 				return empty_string;
 		}
 
 	}
 	va_end(args_b);
 
-	return new_string;
 	TracyCZoneEnd(ctx);
+	return new_string;
 }
 
 char *string_slice_to_cstring(StringSlice slice, Arena *a)
@@ -188,7 +198,7 @@ int string_get(String str, size_t idx, char *item)
 int string_push(String *str, char item)
 {
 	TracyCZone(ctx, true);
-	if (str->length >= (str->capacity - 1))
+	if (str->length >= (str->capacity))
 	{
 		TracyCZoneEnd(ctx);
 		return -1;
@@ -223,7 +233,7 @@ int string_push_slice(String *str, StringSlice slice)
 int string_pop(String *str, char *item)
 {
 	TracyCZone(ctx, true);
-	if (str->length <= 0)
+	if (str->length == 0)
 	{
 		TracyCZoneEnd(ctx);
 		return -1;
@@ -283,7 +293,13 @@ bool string_slice_equal(StringSlice slice_a, StringSlice slice_b)
 size_t string_find(String str, StringSlice pattern)
 {
 	TracyCZone(ctx, true);
-	for (size_t current_char_idx = 0; current_char_idx < str.length; current_char_idx++)
+	if (str.length < pattern.length)
+	{
+		TracyCZoneEnd(ctx);
+		return 0;
+	}
+
+	for (size_t current_char_idx = 0; current_char_idx < (str.length - pattern.length + 1); current_char_idx++)
 	{
 		StringSlice substring = string_slice(str, current_char_idx, pattern.length);
 		if (string_slice_equal(substring, pattern))
@@ -328,7 +344,7 @@ uint64_t string_slice_hash(StringSlice slice)
 	uint64_t hash = 1;
 	for (size_t current_char = 0; current_char < slice.length; current_char++)
 	{
-		hash *= (prime_numbers[slice.data[current_char] % n_prime_numbers] + prime_numbers[(slice.data[current_char] + 1) % n_prime_numbers]) ^ (prime_numbers[(slice.data[current_char]+ 2) % n_prime_numbers]);
+		hash *= (prime_numbers[(unsigned char)slice.data[current_char] % n_prime_numbers] + prime_numbers[((unsigned char)slice.data[current_char] + 1) % n_prime_numbers]) ^ (prime_numbers[((unsigned char)slice.data[current_char]+ 2) % n_prime_numbers]);
 	}
 	TracyCZoneEnd(ctx);
 	return hash;
@@ -355,6 +371,10 @@ static size_t get_formatted_string_length(StringSlice format_string, va_list arg
 			continue;
 		}
 		current_char_idx++;
+		if (current_char_idx >= STRING_LENGTH(format_string))
+		{
+			break;
+		}
 		current_char = format_string.data[current_char_idx];
 
 		switch (current_char)
