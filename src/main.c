@@ -117,6 +117,21 @@ int main(void)
 		printf("%ju\n", (uintmax_t)string_slice_hash(current_slice));
 	}
 
+	String formatted_string = context_string_format(SLICE_FROM_STATIC_STRING("Hello, my name is %s\n"), SLICE_FROM_STATIC_STRING("John")); 
+	printf("Result (str ptr: %p, length: %zu): %.*s", (void *)STRING_GET_RAW_POINTER(formatted_string), STRING_LENGTH(formatted_string), STRING_FORMAT(formatted_string));
+	if (!string_slice_equal(string_as_slice(formatted_string), SLICE_FROM_STATIC_STRING("Hello, my name is John\n")))
+	{
+		fprintf(stderr, "Error: Formatted string did not match.\n");
+		return -1;
+	}
+
+	String formatted_string_invalid = context_string_format(SLICE_FROM_STATIC_STRING("Hello, my name is %i\n"), SLICE_FROM_STATIC_STRING("Josh"));
+	if (STRING_GET_RAW_POINTER(formatted_string_invalid) != NULL)
+	{
+		fprintf(stderr, "Error: Invalid string accepted.\n");
+		return -1;
+	}
+
 	HashTable *table = hashtable_new(32, string_arena);
 
 	if (hashtable_update(table, SLICE_FROM_STATIC_STRING("cats"), 3) != 0)

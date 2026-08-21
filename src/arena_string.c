@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +7,8 @@
 
 #include <arena.h>
 #include <arena_string.h>
+
+static size_t get_formatted_string_length(StringSlice fmt, va_list v);
 
 String string_new(size_t capacity, Arena *a)
 {
@@ -42,6 +45,7 @@ String string_new_from_slice(StringSlice slice, Arena *a)
 
 String string_from_cstring(char *cstring, Arena *a)
 {
+	TracyCZone(ctx, true);
 	if (cstring == NULL)
 	{
 		return (String) { .data = NULL, .length = 0, .capacity = 0 };
@@ -61,7 +65,82 @@ String string_from_cstring(char *cstring, Arena *a)
 
 	StringSlice cstring_slice = SLICE_FROM_PTR_AND_LENGTH(cstring, length);
 
+	TracyCZoneEnd(ctx);
 	return string_new_from_slice(cstring_slice, a);
+}
+
+String string_format(StringSlice format_string, Arena *a, ...)
+{
+	TracyCZone(ctx, true);
+
+	va_list args;
+	va_start(args, a);
+
+	String new_string = string_format_v(format_string, a, args);
+
+	va_end(args);
+
+	TracyCZoneEnd(ctx);
+	return new_string;
+}
+
+String string_format_v(StringSlice format_string, Arena *a, va_list args)
+{
+	TracyCZone(ctx, true);
+
+	va_list args_b;
+	va_copy(args_b, args);
+
+	size_t formatted_string_length = get_formatted_string_length(format_string, args_b);
+
+	String new_string = string_new(formatted_string_length + 1, a);
+
+	String empty_string = {
+		.data = NULL,
+		.length = 0,
+		.capacity = 0,
+	};
+
+	for (size_t current_char_idx = 0; current_char_idx < STRING_LENGTH(format_string); current_char_idx++)
+	{
+		char current_char = format_string.data[current_char_idx];
+		if (current_char == '\0')
+		{
+			break;
+		}
+
+		if (current_char != '%')
+		{
+			if (string_push(&new_string, current_char) != 0)
+			{
+				return empty_string;
+			}
+			continue;
+		}
+		current_char_idx++;
+		current_char = format_string.data[current_char_idx];
+
+		switch (current_char)
+		{
+			case 's':
+				{
+					StringSlice slice = va_arg(args_b, StringSlice);
+					if (string_push_slice(&new_string, slice) != 0)
+					{
+						return empty_string;
+					}
+					break;
+				}
+			default:
+				// invalid format string, return empty string
+				return empty_string;
+		}
+
+	}
+	va_end(args_b);
+
+	return new_string;
+	TracyCZoneEnd(ctx);
 }
 
 char *string_slice_to_cstring(StringSlice slice, Arena *a)
@@ -115,6 +194,28 @@ int string_push(String *str, char item)
 		return -1;
 	}
 	str->data[str->length++] = item;
+	TracyCZoneEnd(ctx);
+	return 0;
+}
+
+int string_push_slice(String *str, StringSlice slice)
+{
+	TracyCZone(ctx, true);
+	size_t new_length = STRING_LENGTH((*str)) + STRING_LENGTH(slice);
+	if (new_length > str->capacity)
+	{
+		return -1;
+	}
+
+	for (size_t current_char_idx = 0; current_char_idx < STRING_LENGTH(slice); current_char_idx++)
+	{
+		char current_char = slice.data[current_char_idx];
+		if (string_push(str, current_char) != 0)
+		{
+			return -1;
+		}
+	}
+
 	TracyCZoneEnd(ctx);
 	return 0;
 }
@@ -231,4 +332,45 @@ uint64_t string_slice_hash(StringSlice slice)
 	}
 	TracyCZoneEnd(ctx);
 	return hash;
+}
+
+
+// Internal Functions
+
+static size_t get_formatted_string_length(StringSlice format_string, va_list args)
+{
+	size_t new_length = 0;
+
+	for (size_t current_char_idx = 0; current_char_idx < STRING_LENGTH(format_string); current_char_idx++)
+	{
+		char current_char = format_string.data[current_char_idx];
+		if (current_char == '\0')
+		{
+			break;
+		}
+
+		if (current_char != '%')
+		{
+			new_length++;
+			continue;
+		}
+		current_char_idx++;
+		current_char = format_string.data[current_char_idx];
+
+		switch (current_char)
+		{
+			case 's':
+				{
+					StringSlice slice = va_arg(args, StringSlice);
+					new_length += STRING_LENGTH(slice);
+					break;
+				}
+			default:
+				// invalid format string, return empty string
+				return 0;
+		}
+
+	}
+
+	return new_length;
 }

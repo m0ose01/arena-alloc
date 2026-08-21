@@ -1,6 +1,7 @@
 #ifndef STRING_H
 #define STRING_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,11 +26,14 @@ String string_new(size_t capacity, Arena *a);
 String string_new_from_slice(StringSlice slice, Arena *a);
 String string_copy(String str, Arena *a);
 String string_from_cstring(char *cstring, Arena *a);
+String string_format(StringSlice format_string, Arena *a, ...);
+String string_format_v(StringSlice format_string, Arena *a, va_list args);
 char *string_slice_to_cstring(StringSlice slice, Arena *a);
 
 StringSlice string_slice(String str, size_t begin, size_t length);
 StringSlice string_as_slice(String str);
 int string_push(String *str, char item);
+int string_push_slice(String *str, StringSlice slice);
 int string_pop(String *str, char *item);
 int string_set(String *array, size_t idx, char item);
 size_t string_find(String str, StringSlice pattern);
@@ -58,6 +62,19 @@ uint64_t string_slice_hash(StringSlice slice);
 	MAYBE_UNUSED static inline String prefix ## _string_new(size_t capacity) { return string_new(capacity, arena); }\
 	MAYBE_UNUSED static inline String prefix ## _string_new_from_slice(StringSlice slice) { return string_new_from_slice(slice, arena); }\
 	MAYBE_UNUSED static inline String prefix ## _string_copy(String str) { return string_copy(str, arena); }\
+	MAYBE_UNUSED static inline String prefix ## _string_from_cstring(char *cstring) { return string_from_cstring(cstring, arena); }\
+	MAYBE_UNUSED static inline String prefix ## _string_format(StringSlice format_string, ...)\
+	{\
+		va_list args;\
+		va_start(args, format_string);\
+		\
+		String new_string = string_format_v(format_string, arena, args);\
+		\
+		va_end(args);\
+		\
+		return new_string;\
+	}\
 	MAYBE_UNUSED static inline char* prefix ## _string_slice_to_cstring(StringSlice slice) { return string_slice_to_cstring(slice, arena); }\
+String string_format(StringSlice format_string, Arena *a, ...);
 
 #endif
