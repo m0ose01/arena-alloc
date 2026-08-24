@@ -16,7 +16,7 @@
 
 #endif
 
-#define arraylen(a) array.length
+#define arraylen(a) ((a).length)
 
 #define DEFINE_ARRAY(name, T)\
 	typedef struct name##_t \
