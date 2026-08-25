@@ -44,11 +44,13 @@ void *arena_alloc(Arena *a, size_t size, size_t alignment)
 	TracyCZone(ctx, 1);
 	if (alignment == 0)
 	{
+		TracyCZoneEnd(ctx);
 		return NULL;
 	}
 
 	if (size < 1)
 	{
+		TracyCZoneEnd(ctx);
 		return NULL;
 	}
 
@@ -61,6 +63,7 @@ void *arena_alloc(Arena *a, size_t size, size_t alignment)
 	{
 		if (a->current_region_index + 1 >= MAX_REGIONS)
 		{
+			TracyCZoneEnd(ctx);
 			return NULL;
 		}
 
