@@ -185,6 +185,20 @@ int main(void)
 
 	printf("Length: %zu\n", arraylen(array));
 
+	uint64_t number = UINT64_MAX;
+	StringSlice string_to_read = SLICE_FROM_STATIC_STRING("1234");
+	if (string_slice_to_uint64(string_to_read, &number))
+	{
+		fprintf(stderr, "Error: Failed to parse uint64_t from string %.*s", STRING_FORMAT(string_to_read));
+		return -1;
+	}
+	if (number != 1234)
+	{
+		fprintf(stderr, "Error: string %.*s was read as %llu, not 1234.\n", STRING_FORMAT(string_to_read), number);
+		return -1;
+	}
+
+
 	arena_free(string_arena);
 	string_arena = NULL;
 

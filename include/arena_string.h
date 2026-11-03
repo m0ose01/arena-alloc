@@ -41,6 +41,7 @@ size_t string_split(String str, StringSlice pattern, StringSlice *slice_a, Strin
 int string_trim(String *str, size_t n);
 bool string_slice_equal(StringSlice slice_a, StringSlice slice_b);
 uint64_t string_slice_hash(StringSlice slice);
+int string_slice_to_uint64(StringSlice slice, uint64_t *out);
 
 #define STRING_FORMAT(s) (int)s.length, s.data
 #define STRING_LENGTH(s) s.length

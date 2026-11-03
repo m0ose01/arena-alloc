@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -267,6 +268,35 @@ int string_trim(String *str, size_t n)
 	str->length -= n;
 	TracyCZoneEnd(ctx);
 	return 0;
+}
+
+int natoi(char *s, int n)
+{
+    int x = 0;
+    while(isdigit(s[0]) && n--)
+    {
+        x = x * 10 + (s[0] - '0');      
+        s++;
+    }
+    return x;
+}
+
+int string_slice_to_uint64(StringSlice slice, uint64_t *out)
+{
+	int success = 0;
+	uint64_t number = 0;
+	for (size_t current_char = 0; current_char < slice.length; current_char++)
+	{
+		if (!isdigit((unsigned char)slice.data[current_char]))
+		{
+			success = -1;
+			break;
+		}
+		number = number * 10 + (slice.data[current_char] - '0');
+	}
+
+	*out = number;
+	return success;
 }
 
 bool string_slice_equal(StringSlice slice_a, StringSlice slice_b)
